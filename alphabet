@@ -1,0 +1,103 @@
+#!/usr/bin/python
+
+import sys
+
+alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z' ]
+
+def get_position(letter):
+    # print "letter position\n"
+    if(len(letter)>1):
+        index = 0
+        index = (len(letter)-1)*26
+        index += alphabet.index(letter[len(letter)-1:])+1
+        # for i in letter:
+        #     index += alphabet.index(i)+1
+        #     index += 26
+        return index
+
+    return alphabet.index(letter)+1
+
+def get_letter(number):
+    # print "number position"
+    letter = ""
+    if number > len(alphabet):
+        remainder = number%26
+        multiply = number/26
+        # print "number:", number, "\tmultiply:", multiply, "\tremainder:", remainder
+        # print "alphabet[remainder-1]",alphabet[remainder-1]
+        if remainder != 0:
+            return alphabet[multiply-1]+alphabet[remainder-1]
+        else:
+            return alphabet[multiply-1]+alphabet[remainder]
+    else:
+        return alphabet[number-1]
+
+
+
+def get_position_test(letter,result, hide_passed=False):
+    try:
+        assert get_position(letter) == result
+        if not hide_passed:
+            print "assert get_position("+str(letter)+") =="+str(result) + "\tpassed"
+    except:
+        print "assert get_position("+str(letter)+") == "+str(result) + "\tfailed!","\tgave:",get_position(letter)
+        
+def get_letter_test(number,result, hide_passed=False):
+    try:
+        assert get_letter(number) == result
+        if not hide_passed:
+            print "assert get_letter("+str(number)+") == "+str(result) + "\tpassed"
+    except:
+        print "assert get_letter("+str(number)+") == "+str(result) + "\tfailed!", "\tgave:", get_letter(number)
+
+
+def tests():
+    get_position_test('a',1)
+    get_position_test('aa',27)
+    get_position_test('az',52)
+    
+    get_letter_test(1,'a')
+    get_letter_test(26,'z')
+    get_letter_test(27,'aa')
+    
+
+
+if __name__ == "__main__":
+    if len(sys.argv) >0:
+        arg = sys.argv[1]
+    else:
+        sys.exit()
+    if arg == "tests":
+        print "running tests..."
+        tests()
+        sys.exit()
+
+
+    try:
+        # if len(arg) != 1:
+        #     print "***argument must be a single character***"
+        #     sys.exit()
+        if arg[0] in alphabet:
+            print arg, " - ", get_position(arg)
+        else:
+            try:
+                arg = int(arg)
+                print arg, " - ",get_letter(arg).upper()
+            except Exception as e:
+                print e
+        
+    except Exception as e:
+        if type(e) == ValueError:
+            print "input must be in range [a-z]"
+        else:
+            print "unknown error..."
+        sys.exit()
+
+
+
+
+        
+
+
+
+

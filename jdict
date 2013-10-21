@@ -1,0 +1,147 @@
+#!/usr/bin/python
+
+import urllib2
+import json
+
+def define_word(word):
+    opener = urllib2.build_opener()
+    opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+
+    arg = str(word)
+    arg = '+'.join(arg.split(' '))
+
+    url = "http://www.google.com/dictionary/json?callback=dict_api.callbacks.id100&q="+arg+"&sl=en&tl=en&restrict=pr%2Cde&client=te"
+    try:
+        req = opener.open(url)
+
+    except Exception as e:
+        print 'doh!',e
+        return None
+    
+    # clean up the output removing all the garbage we don't want/need.
+    output = "".join(req)
+    output = output.split('dict_api.callbacks.id100(') 
+    output = output[1].split(',200,null)') 
+    output = output[0]
+    output = output.replace('\\','')
+    output = json.loads(output)
+    
+    try:
+        defn = output['webDefinitions']
+    except Exception as e:
+        print "'%s' has no definition." %arg.replace("+", " ")
+        spell_check = spelling(arg)
+        if spell_check == None:
+            print "'%s' NO definition and NO options to correct spelling - is '%s' a real word?" % (arg,arg)
+        else:
+            print "Did you really mean: %s" % spelling(arg)
+            
+        return None
+    defn = defn[0]
+    defn = defn['entries']
+
+    return defn #list
+
+def format_definition(defn,key,index=0):
+    """ parses the returned output for easier reading """
+    text = defn[index]['terms'][0]['text']
+    text = text.split(';')
+    defnition = text[0]
+    text = text[1:]
+    quotes= []
+    flag = False
+
+    for x in range(len(text)):
+        q = text[x]
+        if q == " x26quot" and x+1 < len(text):
+            quotes.append(text[x+1])
+
+    quo = []
+    for i in quotes:
+        i = i.replace("x26quot",'')
+        quo.append(i)
+
+    print key,":",defnition
+    if(len(quo) > 0):
+        for q in quo:
+            print "\tEx. ",q
+
+
+def spelling(word):
+    """
+    https://github.com/bkvirendra/didyoumean/blob/master/didYouMean.py
+    Honestly this guy did a much better more elegant job, but that's alot of deps -
+    not all my machines have beautiful soup, and what I do is mostly good enough.
+    """
+    
+    opener = urllib2.build_opener()
+    opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+    word = "+".join(word.split(' '))
+    url = "http://www.google.com/search?q='%s'" % word
+    
+    #request = urllib2.Request(url)
+    try:
+        req = opener.open(url)
+    except Exception as e:
+        print "doh!",e
+        return e
+
+    # you could totally do this more elegantly, but this works right?
+    out =  req.read().split('<a class="spell" href="/search?q=')
+    if(len(out) >=2):
+        correction =  out[1].split('&amp')[0]
+        correction = correction.replace("'","")
+        correction = correction.replace("+"," ")
+        return correction
+    else:
+        return None
+
+
+    
+
+
+    
+
+    
+if __name__ == "__main__":
+    import argparse
+    
+    
+    parser = argparse.ArgumentParser(description="Program using google to do dictionary definition's and spell check words. It's worth checking out the 'dict' & 'aspell' program which is probably installed systems.")
+
+    parser.add_argument('word', metavar='',nargs='+', type=str)
+    parser.add_argument('-i','--index',type=int,help="When doing a dictionary search this shows a specific return index. Default is 0. ") 
+    parser.add_argument('-a','--all',action='store_true',help="Shows all the dictionary results.")
+
+    parser.add_argument('-s','--spelling',action='store_true', help="Only check the spelling")
+    args = parser.parse_args()
+
+
+    search_term = " ".join(args.word)
+    if(args.spelling):
+        correction =  spelling(search_term)
+        if(correction != None):
+            print correction
+        else:
+            print "'%s' is the correct word?" % search_term
+
+    
+    if(args.index):
+        index = args.index
+    else:
+        index = 0
+
+    if(not args.spelling):
+        try:
+            defn = define_word(search_term)
+            if(defn != None):
+                if args.all:
+                    for i in range(len(defn)):
+                        print "("+str(i)+")",
+                        format_definition(defn,search_term,i)
+                        print " "
+                else:
+                    format_definition(defn,search_term,index)
+        except Exception as e:
+            print e
+    
