@@ -1,0 +1,57 @@
+Bunch of random tools I have wrote (and a couple I didn't)
+
+* Written by me.
+** alphabet
+  Returns the numerical index of a character.
+  (ie: a == 1 or 27 == aa)
+
+  Usage:
+  #+BEGIN_SRC sh
+     ./alphabet a
+  #+END_SRC
+
+  #+BEGIN_SRC sh
+     ./alphabet 1
+  #+END_SRC
+
+** datetime_to_unix
+  Converts a datetime (2013-01-01) to unix time.
+
+  #+BEGIN_SRC sh
+  ./datetime_to_unix 2013-01-01
+  #+END_SRC
+** unix_to_datetime
+  Converts unix time to a datetime object.
+  #+BEGIN_SRC sh
+  ./unix_to_datetime 1325394000
+  #+END_SRC
+** jdict
+  Does a dictioary lookup using google or corrects spelling.
+  #+BEGIN_SRC sh
+   ./jdict --help
+usage: jdict [-h] [-i INDEX] [-a] [-s]  [...]
+
+Program using google to do dictionary definition's and spell check words. It's
+worth checking out the 'dict' & 'aspell' program which is probably installed
+systems.
+
+positional arguments:
+  
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i INDEX, --index INDEX
+                        When doing a dictionary search this shows a specific
+                        return index. Default is 0.
+  -a, --all             Shows all the dictionary results.
+  -s, --spelling        Only check the spelling
+#+END_SRC
+
+** mpd_startup
+  If checks if mpd and mpdscribble are running, if not it starts them
+
+* Other (probably not written by me) 
+** list_term_colors.sh
+  dumps out the term color capabilities. Handy for seeing if you have 256 color mode running or not.
+
+  
